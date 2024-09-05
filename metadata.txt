@@ -1,0 +1,17 @@
+[general]
+name=SunoCadastre
+description=Suno Cadastre
+qgisMinimumVersion=3.22
+version=1.1.4
+author=PSIG
+email=david.erill@psig.es
+tags=python, SUNO
+category=Plugins
+icon=img/suno.png
+experimental=False
+deprecated=False
+
+[app]
+service=gis_suno
+cod_muni=08001
+output_folder=C:/output_folder
