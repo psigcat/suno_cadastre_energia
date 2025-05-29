@@ -141,7 +141,22 @@ class SunoTask(QgsTask):
         # Gestió àtics
         self.set_obtencio_us()
         self.manage_atics()
-               
+                   
+
+   
+   
+        # Afegim les noves funcions per calcular i distribuïr la superfície residencial
+        
+        ## self.calculate_residential_surface()    
+        ## self.distribute_residential_surface()                
+        
+        log_info(f"Executant càlculs suma i distribució superfície residencial")
+        filename = "23_create_temp_superficie_residencial.sql"
+        status, msg = self.process_file(self.sql_folder, filename)
+        if not status:
+            log_warning(f"Error executant script '{filename}':\n{msg}")
+            return False
+
         # Cal commitejar canvis per tal de poder executar 'ogr2ogr'
         self.conn.commit()
 
@@ -256,12 +271,13 @@ class SunoTask(QgsTask):
     def build_sql(self, sql, planta=None):
         """ Substituir paràmetres: [SCHEMA_NAME], [COD_MUNI], [TABLE_BUILDING], [TABLE_BUILDING_PART] """
         
+        log_info("Substitució paràmetres ... [PLANTA] ")
         sql = sql.replace('[SCHEMA_NAME]', f'"{self.schema}"')
         sql = sql.replace('[COD_MUNI]', f'{self.cod_muni}')
         table_building = f"{self.cod_muni}_building"
         table_building_part = f"{self.cod_muni}_buildingpart"
         sql = sql.replace('[TABLE_BUILDING]', f'"{table_building}"')
-        sql = sql.replace('[TABLE_BUILDING_PART]', f'"{table_building_part}"')
+        sql = sql.replace('[TABLE_BUILDING_PART]', f'"{table_building_part}"')         
         if planta:
             sql = sql.replace('[PLANTA]', f'{planta}')
             altura = 3.2
@@ -269,6 +285,10 @@ class SunoTask(QgsTask):
             if planta == "00":
                 altura = 4
                 c14_planta = f"'{planta} ', 'BJ ', 'BX '"
+            elif planta == "OD":
+                c14_planta = "'OD ', 'OT ', 'TR ', 'ALT '"
+                # ('AL ', 'SM ', 'OP ') 
+                num_planta = 99
             num_planta = int(planta)
             sql = sql.replace('[ALTURA]', f'{altura}')
             sql = sql.replace('[C14_PLANTA]', c14_planta)  
