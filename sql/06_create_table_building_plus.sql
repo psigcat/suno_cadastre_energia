@@ -2,7 +2,8 @@
 DROP TABLE IF EXISTS [SCHEMA_NAME].building_plus CASCADE;
 CREATE TABLE [SCHEMA_NAME].building_plus AS
 SELECT 
-   b.ogc_fid as id, b.geom as geom,
+   --b.ogc_fid as id, b.geom as geom,
+   b.id as id, b.geom as geom,
    b.conditionofconstruction, b.beginning, b."end",
    b.reference as refcat, b.currentuse,
    b.numberofbuildingunits, b.numberofdwellings, b.numberoffloorsaboveground,
