@@ -144,10 +144,11 @@ update [SCHEMA_NAME].edificis14 set
 -- edificis 14, poso a planta 0 totes les referències de planta que no siguin nombres
 UPDATE [SCHEMA_NAME].edificis14
 SET planta = '0  '
-WHERE planta IN ('PR ','PB ','OD ','S3 ','SA ','SOT','SC ','PC ', 'OP ', 'SM ', 'SO ', 'UE ', 'BJ ', 'TR ', 'PK ', 'OM ', 'SS ', 'AT ', 'ST ','S2 ', 'S1 ', 
-'S0 ', 'PP ', 'PIS', 'OR ', 'OL ', 'MU ', 'LC ', 'IS ', 'EX ', 'ENT', 'EN ', 'CO ', 'BX ', 'BE ', 'AL ', 'ES ', 'CC ','MUN','CA ','DX ', '-  ');
+WHERE planta IN ('PR ','PB ','OD ','S3 ','SA ','SOT','SC ','PC ', 'OP ', 'SM ', 'SO ', 'UE ', 'BJ ', 'TR ', 'PK ', 'OM ', 'SS ', 'AT ', 'ST ','S2 ', 'S1 ', 'AP ', 'PT', 'PL', 
+'RS', 'PTA', 'S0 ', 'PP ', 'PIS', 'OR ', 'OL ', 'MU ', 'LC ', 'IS ', 'EX ', 'ENT', 'EN ', 'CO ', 'BX ', 'BE ', 'AL ', 'ES ', 'CC ','MUN','CA ','DX ', '-  ');
 ALTER TABLE [SCHEMA_NAME].edificis14 ALTER COLUMN planta SET DATA TYPE integer 
 USING NULLIF(TRIM(planta), '')::integer;
+
 
 -- edificis 14, creo columna amb any_reforma
 alter table [SCHEMA_NAME].edificis14 
