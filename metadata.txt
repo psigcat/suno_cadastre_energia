@@ -15,3 +15,4 @@ deprecated=False
 service=gis_suno
 cod_muni=08001
 output_folder=C:/output_folder
+schema_prefix=e

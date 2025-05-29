@@ -5,8 +5,7 @@ def main_app():
     """ Create main application """
 
     try:
-        cod_muni = "17049"
-        suno_task = SunoTask(cod_muni)  
+        suno_task = SunoTask(None)
         if suno_task.init_db():
             suno_task.run()
     except Exception as e:

@@ -76,7 +76,7 @@ class SunoTask(QgsTask):
             self.cursor = self.conn.cursor()
             log_info(f"Connexió correcta al servei de Base de Dades '{service_name}'")
             return True
-        except (Exception) as e:
+        except Exception as e:
             log_warning(f"Connexió errònia al servei de Base de Dades '{service_name}': {e}")
             return False
 
@@ -84,7 +84,12 @@ class SunoTask(QgsTask):
     def init_main(self):
         """ Inicialització del procés """
 
-        self.schema = f"e{self.cod_muni}"
+        schema_prefix = get_metadata_parameter(self.plugin_dir, "app", "schema_prefix")
+        if schema_prefix is None:
+            schema_prefix = "e"
+        if self.cod_muni is None:
+            self.cod_muni = get_metadata_parameter(self.plugin_dir, "app", "cod_muni")
+        self.schema = f"{schema_prefix}{self.cod_muni}"
         self.sql_folder = os.path.join(self.plugin_dir, "sql") 
         self.output_folder = get_metadata_parameter(self.plugin_dir, "app", "output_folder")
         if self.output_folder is None:
