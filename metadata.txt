@@ -2,7 +2,7 @@
 name=SunoCadastre
 description=Suno Cadastre
 qgisMinimumVersion=3.22
-version=1.1.4
+version=1.1.5
 author=PSIG
 email=david.erill@psig.es
 tags=python, SUNO

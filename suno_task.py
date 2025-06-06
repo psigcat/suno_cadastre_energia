@@ -146,15 +146,10 @@ class SunoTask(QgsTask):
         # Gestió àtics
         self.set_obtencio_us()
         self.manage_atics()
-                   
 
-   
-   
-        # Afegim les noves funcions per calcular i distribuïr la superfície residencial
-        
-        ## self.calculate_residential_surface()    
-        ## self.distribute_residential_surface()                
-        
+        # Gestió forats interiors
+        self.manage_holes()
+
         log_info(f"Executant càlculs suma i distribució superfície residencial")
         filename = "23_create_temp_superficie_residencial.sql"
         status, msg = self.process_file(self.sql_folder, filename)
@@ -498,4 +493,15 @@ class SunoTask(QgsTask):
                 cursor_2.execute(sql)
 
         return True
+
+
+    def manage_holes(self):
+        """ Manage interior holes in building parts """
+
+        log_info("Eliminar forats interiors")
+        cursor = self.conn.cursor()
+        sql = (f"UPDATE {self.schema}.building_part_planta_juntes "
+               f"SET geom = ST_MakePolygon(ST_ExteriorRing(geom)) "
+               f"WHERE ST_NumInteriorRings(geom) > 0;")
+        cursor.execute(sql)
 
