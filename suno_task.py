@@ -175,12 +175,10 @@ class SunoTask(QgsTask):
         self.output_folder = os.path.join(self.output_folder, self.cod_muni) 
         if not os.path.exists(self.output_folder):
             os.makedirs(self.output_folder)        
-        log_info(f"Generant fitxers de sortida a la carpeta: {self.output_folder}")
-        for planta in range(num_plantes + 1):
-            planta = str(planta).zfill(2)
-            self.export_to_geojson(ogr2ogr, planta)
 
+        log_info(f"Generant fitxer de sortida a la carpeta: {self.output_folder}")
         self.export_to_geojson(ogr2ogr, "juntes")
+
         return True
 
 
