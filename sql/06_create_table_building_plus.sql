@@ -1,8 +1,6 @@
-
 DROP TABLE IF EXISTS [SCHEMA_NAME].building_plus CASCADE;
 CREATE TABLE [SCHEMA_NAME].building_plus AS
 SELECT 
-   --b.ogc_fid as id, b.geom as geom,
    b.id as id, b.geom as geom,
    b.conditionofconstruction, b.beginning, b."end",
    b.reference as refcat, b.currentuse,
@@ -10,12 +8,11 @@ SELECT
    b.value, b.value_uom
 FROM cadastre_input.[TABLE_BUILDING] as b;
 
--- definimos la Primary Key, 
-alter table [SCHEMA_NAME].building_plus ADD PRIMARY KEY (id);
+ALTER TABLE [SCHEMA_NAME].building_plus ADD PRIMARY KEY (id);
 
 
 -- edificis 14, agafem la planta més alta de cada parcela i la posem a la taula building_plus
-alter table [SCHEMA_NAME].building_plus add column if not exists plantes integer;
+ALTER TABLE [SCHEMA_NAME].building_plus ADD COLUMN IF NOT EXISTS plantes integer;
 
 UPDATE [SCHEMA_NAME].building_plus AS b
 SET plantes = (
@@ -30,40 +27,37 @@ SET plantes = (
 
 
 -- Posem a cero els nuls
-update [SCHEMA_NAME].building_plus as b
-set plantes = 0
-where plantes is null;
+UPDATE [SCHEMA_NAME].building_plus AS b
+SET plantes = 0
+WHERE plantes IS NULL;
 
--- Classifiuem els tipus d'habitatge
-alter table [SCHEMA_NAME].building_plus add column if not exists tipus_hab text;
+-- Classifiquem els tipus d'habitatge
+ALTER TABLE [SCHEMA_NAME].building_plus ADD COLUMN IF NOT EXISTS tipus_hab text;
 
-update [SCHEMA_NAME].building_plus as b
-set tipus_hab =
+UPDATE [SCHEMA_NAME].building_plus AS b
+SET tipus_hab =
   CASE
-    when b.numberofdwellings = 1 then 'ResUnifamilar' --unifamiliar
-    when b.numberofdwellings > 1 and b.plantes <3 then 'ResPlurifamBaix'
-    when b.numberofdwellings > 1 and b.plantes >2 then 'ResPlurifamAlt'
-    else 'Altres'
-  end
-;
+    WHEN b.numberofdwellings = 1 THEN 'ResUnifamilar' --unifamiliar
+    WHEN b.numberofdwellings > 1 AND b.plantes <3 THEN 'ResPlurifamBaix'
+    WHEN b.numberofdwellings > 1 AND b.plantes >2 THEN 'ResPlurifamAlt'
+    ELSE 'Altres'
+  END;
 
 -- Afegim el codi municipi a les constuccions
-alter table [SCHEMA_NAME].building_plus add column if not exists codi_ine integer;
-update [SCHEMA_NAME].building_plus as b
- set codi_ine = 
- ( SELECT m."CODIMUNI"
-   from diccionari."Municipis" as m
-   where ST_Within(b.geom, m.geom)
- )
-;
+ALTER TABLE [SCHEMA_NAME].building_plus ADD COLUMN IF NOT EXISTS codi_ine integer;
+UPDATE [SCHEMA_NAME].building_plus AS b
+SET codi_ine = 
+  ( SELECT m."CODIMUNI"
+    FROM diccionari."Municipis" AS m
+    WHERE ST_Within(b.geom, m.geom)
+  );
 
 -- Incorporem la zona climàtica del municipi
-alter table [SCHEMA_NAME].building_plus add column if not exists zona_clima text;
-update [SCHEMA_NAME].building_plus as b
- set zona_clima = 
- ( SELECT z.zona_climatica::text
-   from diccionari.municipis_zones_climatiques as z
-   where b.codi_ine = z.codi_idescat 
- )
-;
+ALTER TABLE [SCHEMA_NAME].building_plus ADD COLUMN IF NOT EXISTS zona_clima text;
+UPDATE [SCHEMA_NAME].building_plus AS b
+SET zona_clima = 
+  ( SELECT z.zona_climatica::text
+    FROM diccionari.municipis_zones_climatiques AS z
+    WHERE b.codi_ine = z.codi_idescat 
+  );
 
