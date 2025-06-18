@@ -102,8 +102,11 @@ class SunoTask(QgsTask):
         """ Procés principal execució per a un municipi """
 
         log_info(f"Es generarà esquema: '{self.schema}'")
-        if not self.exec_sql_files(self.cod_muni):
-            return False
+
+        # Processar els primers 8 fitxers SQL (abans de les plantes)
+        NUM_SQL_FILES = 8
+        if not self.process_first_files(self.sql_folder, NUM_SQL_FILES):
+            return False        
 
         # Cal commitejar canvis per tal de poder executar 'Zonal statistics'
         self.conn.commit()
@@ -129,6 +132,14 @@ class SunoTask(QgsTask):
         if not self.process_planta_file(filename, 0, num_plantes):
             return False
         
+        # Incorporar número d'habitatges en la planta 00
+        filename = "15_update_numberofdwellings.sql"
+        log_info(f"Actualitzant número d'habitatges en la planta 00")
+        status, msg = self.process_file(self.sql_folder, filename)
+        if not status:
+            log_warning(f"Error executant script '{filename}':\n{msg}")
+            return False
+
         # Creant taula 'building_part_planta_juntes'
         log_info("Creant taula 'building_part_planta_juntes'")
         filename = "20_create_table_building_part_planta_juntes.sql"
@@ -200,28 +211,12 @@ class SunoTask(QgsTask):
             return num_plantes
     
     
-    def exec_sql_files(self, cod_muni=None):
-        """ Llegir i executar contingut fitxers SQL """
-
-        if cod_muni is None or cod_muni is False:
-            log_info("Obtenint valor del paràmetre 'cod_muni'")
-        else:
-            self.cod_muni = str(cod_muni)
-
-        # Processar primers fitxers (abans de les plantes)
-        if not self.process_first_files(self.sql_folder):
-            return False
-        
-        return True
-
-
-    def process_first_files(self, folderpath):
+    def process_first_files(self, folderpath, num_sql_files=8):
         """ Processar primers fitxers (abans de les plantes) """
 
-        NUM_SQL_FILES = 8
         status = False
         sql_files = self.get_sql_files(folderpath)
-        sql_files = sql_files[:NUM_SQL_FILES]
+        sql_files = sql_files[:num_sql_files]
         for filename in sql_files:
             if self.isCanceled():
                 self._is_canceled = True
@@ -269,7 +264,6 @@ class SunoTask(QgsTask):
     def build_sql(self, sql, planta=None):
         """ Substituir paràmetres: [SCHEMA_NAME], [COD_MUNI], [TABLE_BUILDING], [TABLE_BUILDING_PART] """
         
-        log_info("Substitució paràmetres ... [PLANTA] ")
         sql = sql.replace('[SCHEMA_NAME]', f'"{self.schema}"')
         sql = sql.replace('[COD_MUNI]', f'{self.cod_muni}')
         table_building = f"{self.cod_muni}_building"
