@@ -4,5 +4,6 @@ SET numberofdwellings =
   ( SELECT bp.numberofdwellings 
     FROM [SCHEMA_NAME].building_plus AS bp
     WHERE bp.refcat = bpp.refcat
+    LIMIT 1
   );
 
