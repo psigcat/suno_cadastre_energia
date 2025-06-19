@@ -3,7 +3,7 @@ CREATE TABLE [SCHEMA_NAME].building_plus AS
 SELECT 
    b.id as id, b.geom as geom,
    b.conditionofconstruction, b.beginning, b."end",
-   b.reference as refcat, b.currentuse,
+   UPPER(b.reference) as refcat, b.currentuse,
    b.numberofbuildingunits, b.numberofdwellings, b.numberoffloorsaboveground,
    b.value, b.value_uom
 FROM cadastre_input.[TABLE_BUILDING] as b;
